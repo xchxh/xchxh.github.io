@@ -1,0 +1,151 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>快手无水印解析</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="shortcut icon" href="https://static.yximgs.com/udata/pkg/WEB-LIVE/kwai_icon.8f6787d8.ico">
+        <link rel="stylesheet" href="//lib.sinaapp.com/js/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script>
+        !function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"JdnhHkOriEfYwl4F",ck:"JdnhHkOriEfYwl4F"});
+        </script>
+        <style>
+            #input {
+				position: absolute;
+				top: 0;
+				left: 0;
+				opacity: 0;
+				z-index: -10;
+			}
+            .container{
+                display:table;
+                height:100%;
+            }
+            .row{
+                display: table-cell;
+                vertical-align: middle;
+            }
+            .row-centered {
+                text-align:center;
+            }
+            .col-centered {
+                display:inline-block;
+                float:none;
+                text-align:center;
+            }
+            .alert{
+				font-size: 13px;
+			}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+        <br>
+        <h4 style="text-align:center;font-size:20px;">快手，拥抱每一种生活</h4>
+        <form role="form" action="##" onsubmit="return false" method="post" id="CreateData">
+        <label for="url">请输入链接（不需要去除中文和多余字符）</label>
+        <input type="text" class="form-control" id="url" name="url" placeholder="在快手点击分享按钮后，再点击复制链接"/>
+        <br><div class="Result"></div>
+        <textarea id="input"></textarea>
+        <button type="submit" id='jiexi' class="btn btn-primary btn-block" onclick="checkdata()" >解析</button>
+        </form>
+        <p style="font-size:20px;"><b>简单说明</b></p>
+        <p>1. 本站为快手视频解析，如您使用的是抖音请<a href="/dy">使用抖音解析</a>。</p>
+        <p>2. 本站只是提供解析的操作，所有视频的版权仍属于「北京快手科技有限公司」。</p>
+        <p>3. 突破快手视频禁止保存视频、视频有效期短、视频有水印等限制。</p>
+        <p>4. 请勿用于任何商业用途，如有构成侵权的，本站概不负责，后果自负。</p>
+        <p id="about_visitor">当前访客： </p>
+        </div>
+        <script>
+        fetch('https://api.kieng.cn/ipgeography')
+        .then(response => response.json())
+        .then(data => {
+        const about_visitor = document.getElementById('about_visitor')
+        about_visitor.innerText = about_visitor.innerText +  data.ip + " " + data.pos
+        })
+        .catch(console.error)
+        </script>
+        <script src="//lib.sinaapp.com/js/jquery/1.10.2/jquery-1.10.2.min.js"></script>
+        <script src="//lib.sinaapp.com/js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+        function checkdata(){
+            var result = document.getElementById("url").value;
+            var myRe = /https:\/\/v\.k.+?\/s\/\w+/;
+            u=myRe.exec(result)
+            if(u){
+                document.getElementById("url").value=u[0]
+                return submitdata();
+            }
+            else{
+                var myRe = /https:\/\/v\.k.+?\/\w+/;
+                u=myRe.exec(result)
+                if(u){
+                    document.getElementById("url").value=u[0]
+                    return submitdata();
+                    return false;}
+                else{alert("请输入有效链接！");}
+            }
+            }
+        function oCopy(obj){
+            $("#copyMe").select()
+            document.execCommand('copy')
+            alert("复制成功,粘贴到论坛即可直接播放")
+            }
+        function submitdata() {
+            $("#jiexi").attr('class', 'btn btn-warning btn-block disabled');
+            $("#jiexi").text('解析中')
+            $(".container .Result").css('display', 'block');
+			$(".container .Result").html(
+						    '<div class="alert alert-warning"><strong>解析中，请耐心等待，不要关闭网页！</strong></div>');
+			$(".container .ewm").css('display', 'block');
+            var fields = $('#CreateData').serializeArray();
+            var obj = {};
+            $.each(fields, function(index, field) {
+                obj[field.name] = field.value; 
+            })
+            $.ajax({
+                type: "POST",
+                url: "https://jx.aapi.eu.org/kszl" ,
+                contentType: 'application/json',
+                data: JSON.stringify(obj)  ,
+                success: function (result) {
+                    if(result.code == 555){
+                        $("#jiexi").attr('class', 'btn btn-success btn-block');
+                        $("#jiexi").text('解析成功')
+                        $(".container .Result").css('display', 'block');
+                        var cpt = `${result.desc}[audio=X]${result.url}[/audio]${result.img}`;
+					    $(".container .Result").html(
+                        `<div class="alert alert-info"><input type="text" name="tname" size=38 id="copyMe" value ='${cpt}'><br><br><button type="button" class="btn btn-sm btn-primary" onclick="oCopy()">连同UBB复制</button></div>`);
+					    $(".container .ewm").css('display', 'block');
+                    }else if(result.code == 666){
+                        $("#jiexi").attr('class', 'btn btn-success btn-block');
+                        $("#jiexi").text('解析成功')
+                        $(".container .Result").css('display', 'block');
+                        var cpt = `${result.desc}[movie=100%*100%]${result.url}|${result.img}[/movie]`;
+					    $(".container .Result").html(
+                        `<div class="alert alert-info"><input type="text" name="tname" size=38 id="copyMe" value ='${cpt}'><br><br><button type="button" class="btn btn-sm btn-primary" onclick="oCopy()">连同UBB复制</button></div>`);
+					    $(".container .ewm").css('display', 'block');
+                    }else{
+                        $("#jiexi").attr('class', 'btn btn-danger btn-block');
+                        $("#jiexi").text('解析失败')
+						$(".container .Result").css('display', 'block');
+					    $(".container .Result").html(
+						'<div class="alert alert-danger"><strong>服务器异常！请再次尝试！</strong></div>');
+						$(".container .ewm").css('display', 'block');
+							}
+					},
+                error : function() {
+                    $("#jiexi").attr('class', 'btn btn-danger btn-block');
+                    $("#jiexi").text('解析失败')
+                    $(".container .Result").css('display', 'block');
+					$(".container .Result").html(
+						'<div class="alert alert-danger"><strong>服务器异常！请再次尝试！</strong></div>');
+					$(".container .ewm").css('display', 'block');
+					setTimeout('closesctips()', 12000);
+                }
+            });
+        }
+    </script>
+    </body>
+</html>
